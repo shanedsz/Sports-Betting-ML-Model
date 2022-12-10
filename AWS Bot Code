@@ -1,0 +1,180 @@
+import boto3
+from botocore.exceptions import ClientError
+import logging
+import uuid
+import random
+import time
+import os
+from base64 import b64decode
+sns_client = boto3.client('sns')
+dynamodb_client = boto3.client('dynamodb')
+from boto3.dynamodb.conditions import Key, Attr
+ses_client = boto3.client('ses')
+logger = logging.getLogger()
+import datetime
+def elicit_slot(session_attributes, intent_name, slots, slot_to_elicit, message):
+    return {
+        'sessionAttributes': session_attributes,            
+        'dialogAction': {
+            'type': 'ElicitSlot',
+            'intentName': intent_name,
+            'slots': slots,
+            'slotToElicit': slot_to_elicit,
+            'message': message
+        }
+    }
+def close(session_attributes, fulfillment_state, message):
+    response = {                                                #set response to return
+        'sessionAttributes': session_attributes,
+        'dialogAction': {
+            'type': 'Close',
+            'fulfillmentState': fulfillment_state,
+            'message': message
+        }
+    }
+    return response
+def send_email(name,firstQ,firstQText,secondQ,secondQText,thirdQ,thirdQText,forthQ,forthQText):
+    SENDER = "SARPONG2021@ICLOUD.COM"
+    RECIPIENT = "muhammed_naqash@yahoo.com"
+    AWS_REGION = "us-east-1"
+    SUBJECT = "New Answers"
+
+    BODY_TEXT = f"""Hi you have New User Answers\r\n
+    
+             \r\nName : {name} \n
+             \r\n{firstQText}\n {firstQ}\n
+             \r\n{secondQText}\n {secondQ}\n
+             \r\n{thirdQText}\n {thirdQ}\n
+             \r\n{forthQText}\n {forthQ}\n"""
+        
+  
+    CHARSET = "UTF-8"
+    try:
+        response = ses_client.send_email(
+        Destination={
+            'ToAddresses': [
+                RECIPIENT,'albertsarpong2022@gmail.com'
+            ],
+        },
+            Message={
+            'Body': {
+                'Text': {
+                    'Charset': CHARSET,
+                    'Data': BODY_TEXT,
+                },
+            },
+            'Subject': {
+                'Charset': CHARSET,
+                'Data': SUBJECT,
+            },
+        },
+        Source=SENDER,
+    )
+    except ClientError as e:
+        print(e.response['Error']['Message'])
+    else:
+        print("Email sent! Message ID:"),
+        print(response['MessageId'])
+        return "true"
+def MakeMatchBet(intent_request):
+    slots = intent_request['currentIntent']['slots']
+    source = intent_request['invocationSource'] 
+    output_session_attributes = intent_request['sessionAttributes'] if intent_request['sessionAttributes'] is not None else {}
+
+    Name = intent_request['currentIntent']['slots']['Name'] 
+    # if Name is None:
+        
+    #     intent_request['currentIntent']['slots']['Name']=event.inputTranscript
+    #     Name=intent_request['currentIntent']['slots']['Name']
+    firstQ = intent_request['currentIntent']['slots']['firstQ']
+    firstQText='who will win between LA Lakers and Miami heat?'
+
+    secondQ = intent_request['currentIntent']['slots']['secondQ']
+    secondQText='How many points us LeBron James likely to score?'
+    
+    thirdQ = intent_request['currentIntent']['slots']['thirdQ']
+    thirdQText='Who will win between Arsenal and Liverpool?'
+    
+    forthQ = intent_request['currentIntent']['slots']['forthQ']
+    forthQText='Who is the most likely to score in the game?'
+
+    
+    if source == 'DialogCodeHook':  
+        if intent_request['currentIntent']['confirmationStatus'] == 'Confirmed':
+            return "tr"
+        if Name is None: 
+            print('----------------')
+            return elicit_slot(
+                output_session_attributes,
+                'MatchBet',
+                slots,
+                'Name',
+                {'contentType': 'PlainText', 'content': 'Hello, I am the Intelligent Agent, who do I have the honor of speaking with today?'}
+                )
+        elif firstQ is None: 
+            print('----------------')
+            return elicit_slot(
+                output_session_attributes,
+                'MatchBet',
+                slots,
+                'firstQ',
+                {'contentType': 'PlainText', 'content': 'Hey '+Name+','+firstQText}
+                )   
+        elif secondQ is None: 
+            print('----------------')
+            return elicit_slot(
+                output_session_attributes,
+                'MatchBet',
+                slots,
+                'secondQ',
+                {'contentType': 'PlainText', 'content': secondQText}
+                )
+                
+        elif thirdQ is None: 
+            print('----------------')
+            return elicit_slot(
+                output_session_attributes,
+                'MatchBet',
+                slots,
+                'thirdQ',
+                {'contentType': 'PlainText', 'content': thirdQText}
+                )
+                
+        elif forthQ is None: 
+            print('----------------')
+            return elicit_slot(
+                output_session_attributes,
+                'MatchBet',
+                slots,
+                'forthQ',
+                {'contentType': 'PlainText', 'content': forthQText}
+                )
+                
+                
+
+        else:
+            print('---test---')
+            send_email(Name,firstQ,firstQText,secondQ,secondQText,thirdQ,thirdQText,forthQ,forthQText)
+            return close(                                                              #call close method
+                    output_session_attributes,
+                    'Fulfilled',
+                    {
+                        'contentType': 'PlainText',
+                        'content': 'Okay, great: This call may be monitored and recorded for record-keeping, training, and qualityassurance purposes'
+                    }
+                )           
+            
+            
+def dispatch(intent_request):
+   
+    logger.debug('dispatch userId={}, intentName={}'.format(intent_request['userId'], intent_request['currentIntent']['name'])) #console data 
+
+    intent_name = intent_request['currentIntent']['name']           
+
+    if intent_name == 'MatchBet':
+        return MakeMatchBet(intent_request)              
+
+    raise Exception('Intent with name ' + intent_name + ' not supported')
+
+def lambda_handler(event, context):
+    print(event)
