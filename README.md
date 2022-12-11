@@ -1,10 +1,14 @@
 # Sports-Betting-ML-Model
+We will be creating a sports betting model/bot to help people with there bets and increase there win rate.
+
+# Aim 
 The goal of this project is to help people who are placing bets on NBA and EPL games to have a
 higher probability of winning their bet. We will use machine learning algorithms
 (RandomForest, LogisticRegression, and Sequential), to make predictions, as well as compare
 the accuracy of these models. The end product will be a chatbox utilizing AWS Lex which a user
 will be able to ask for the predicted winner of a game they choose.
-# Objectives:
+
+# Objectives
 1. Find reliable and accurate data to using Kaggle. The data we are looking for will be for
 more than 10 seasons and will include over 10 columns of statistics, for every game
 played in every season
