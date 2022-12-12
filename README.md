@@ -4,11 +4,7 @@ We will be creating a sports betting model/bot to help people with there bets an
 # Aim 
 The goal of this project is to help people who are placing bets on NBA and EPL games to have a
 higher probability of winning their bet. We will use machine learning algorithms
-<<<<<<< HEAD
-(RandomForest, LogisticRegression, and Sequential), to make predictions, as well as compare
-=======
 (RandomForest, LogisticRegression, Sequential, and XGBoost), to make predictions, as well as compare
->>>>>>> a2082fa (updated README)
 the accuracy of these models. The end product will be a chatbox utilizing AWS Lex which a user
 will be able to ask for the predicted winner of a game they choose.
 
@@ -18,15 +14,9 @@ more than 10 seasons and will include over 10 columns of statistics, for every g
 played in every season
 2. Perform data cleaning on the data and prepare it for machine learning algorithms (dropna,
 OneHotEncoder, etc.)
-<<<<<<< HEAD
-3. Create three different .py files with a function that runs each of the algorithms mentioned
-(RandomForest, LogisticRegression, and Sequential)
-4. Run the data through the functions and test their accuracy for comparison
-=======
 3. Create five different .ipynb files that runs each of the algorithms mentioned
 (RandomForest, LogisticRegression, Sequential, and XGBoost)
 4. Run the data through the algorithms and test their accuracy for comparison
->>>>>>> a2082fa (updated README)
 5. Create a Amazon Web Services Bot which informs client on the pick according to the algorithm 
 
 # Machine Learning
